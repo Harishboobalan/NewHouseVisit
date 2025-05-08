@@ -1,0 +1,156 @@
+/* Tablet Devices */
+@media (max-width: 992px) {
+    .hero-content h1 {
+      font-size: 40px;
+    }
+    
+    .page-hero .hero-content h1 {
+      font-size: 36px;
+    }
+    
+    .hero-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .hero-buttons .btn {
+      width: 100%;
+      max-width: 250px;
+    }
+    
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 15px;
+    }
+  }
+  
+  /* Mobile Devices */
+  @media (max-width: 768px) {
+    .top-bar-content {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .contact-info span {
+      display: block;
+      margin-right: 0;
+      margin-bottom: 5px;
+    }
+    
+    .header-content {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .main-nav {
+      display: none;
+      width: 100%;
+    }
+    
+    .main-nav.active {
+      display: block;
+    }
+    
+    .main-nav ul {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .main-nav li {
+      margin-left: 0;
+    }
+    
+    .mobile-menu-btn {
+      display: block;
+    }
+    
+    .hero {
+      height: auto;
+      padding: 100px 0;
+    }
+    
+    .page-hero {
+      height: 50vh;
+      min-height: 300px;
+    }
+    
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .view-all {
+      margin-top: 15px;
+    }
+    
+    .testimonial-slider {
+      padding: 0 30px;
+    }
+    
+    .cta-buttons {
+      flex-direction: column;
+    }
+    
+    .filter-container form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .filter-group {
+      min-width: 100%;
+    }
+    
+    .filter-btn {
+      width: 100%;
+    }
+    
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Small Mobile Devices */
+  @media (max-width: 576px) {
+    .hero-content h1 {
+      font-size: 28px;
+    }
+    
+    .page-hero .hero-content h1 {
+      font-size: 28px;
+    }
+    
+    .hero-content p {
+      font-size: 16px;
+    }
+    
+    .section-header h2 {
+      font-size: 28px;
+    }
+    
+    .properties-grid,
+    .projects-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .footer-links {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .pagination {
+      flex-wrap: wrap;
+    }
+  }
