@@ -1,8 +1,10 @@
 require('dotenv').config();
 const express = require('express');
-const axios = require('axios');
 const jsforce = require('jsforce');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
+const axios = require('axios');
+
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -18,6 +20,21 @@ const {
   SF_SECURITY_TOKEN,
   SF_LOGIN_URL
 } = process.env;
+
+// Nodemailer setup for sending emails
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER, // Your email address
+    pass: process.env.EMAIL_PASS, // Your email password or an app-specific password
+  },
+});
+
+// Email sending function
+async function sendEmail(to, subject, text) {
+  const mailOptions = { from: process.env.EMAIL_USER, to, subject, text };
+  await transporter.sendMail(mailOptions);
+}
 
 // Initialize Salesforce connection
 const conn = new jsforce.Connection({
@@ -35,6 +52,31 @@ async function salesforceLogin() {
 }
 
 salesforceLogin();
+
+// API Endpoint: Contact Form Submission
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    // Create a new lead in Salesforce
+    const lead = await conn.sobject('Lead').create({
+      FirstName: name.split(' ')[0], // Assuming first part of name is the first name
+      LastName: name.split(' ').slice(1).join(' '), // Rest is the last name
+      Email: email,
+      Description: message,
+      Company: 'Unknown', // Set a default value or collect this from the form
+      Status: 'New'
+    });
+    
+    // Send confirmation email
+    await sendEmail(email, 'Thank you for contacting us!', 'Your message has been received and we will get back to you soon.');
+
+    res.status(201).json({ success: true, leadId: lead.id });
+  } catch (error) {
+    console.error('Contact form submission error:', error);
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
 
 // API Endpoint: Register User
 app.post('/api/register', async (req, res) => {
