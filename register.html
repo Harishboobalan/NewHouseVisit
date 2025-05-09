@@ -71,8 +71,9 @@
                     <h2>Create Your Account</h2>
                     <p>Already have an account? <a href="login.html">Login here</a></p>
                 </div>
-                
-                <form id="registerForm" class="auth-form">
+                <form id="RegisterForm" class="auth-form">
+                    <div id="authError" class="auth-error" style="display: none;"></div>
+                    <!-- rest of your form -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">First Name</label>
@@ -137,7 +138,7 @@
                             </button>
                         </div>
                     </div>
-                </form>
+                  </form>
             </div>
         </div>
     </section>
@@ -148,5 +149,8 @@
     </footer>
 
     <script src="auth.js"></script>
+    <script src="auth1.js"></script>
+    <script src="auth2.js"></script>
+    <script src="auth-server.js"></script>
 </body>
 </html>
