@@ -1,8 +1,8 @@
+
 [build]
-functions = "netlify/functions"
-publish = "public"
+  functions = "netlify/functions"
 
 [[redirects]]
-from = "/auth/*"
-to = "/.netlify/functions/auth/:splat"
-status = 200
+  from = "/submit-form"
+  to = "/.netlify/functions/send-reply"
+  status = 200
