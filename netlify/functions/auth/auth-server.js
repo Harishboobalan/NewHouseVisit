@@ -188,3 +188,100 @@ app.post('/api/salesforce/lead', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+const express = require('express');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+require('dotenv').config();
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Salesforce OAuth Config
+const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
+const SF_CLIENT_SECRET = process.env.SF_CLIENT_SECRET;
+const SF_REDIRECT_URI = process.env.SF_REDIRECT_URI || 'http://localhost:3000/auth/callback';
+const SF_LOGIN_URL = process.env.SF_LOGIN_URL || 'https://login.salesforce.com';
+
+// JWT Secret for your app's sessions
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Salesforce OAuth endpoints
+const SF_AUTH_URL = `${SF_LOGIN_URL}/services/oauth2/authorize`;
+const SF_TOKEN_URL = `${SF_LOGIN_URL}/services/oauth2/token`;
+
+// Initiate Salesforce OAuth flow
+app.get('/auth/salesforce', (req, res) => {
+  const authUrl = `${SF_AUTH_URL}?response_type=code&client_id=${SF_CLIENT_ID}&redirect_uri=${encodeURIComponent(SF_REDIRECT_URI)}&scope=api refresh_token offline_access`;
+  res.redirect(authUrl);
+});
+
+// Handle Salesforce callback
+app.get('/auth/callback', async (req, res) => {
+  try {
+    const { code } = req.query;
+    if (!code) throw new Error('Authorization code missing');
+
+    // Exchange auth code for tokens
+    const tokenResponse = await axios.post(SF_TOKEN_URL, new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: SF_CLIENT_ID,
+      client_secret: SF_CLIENT_SECRET,
+      redirect_uri: SF_REDIRECT_URI,
+      code
+    }));
+
+    const { access_token, refresh_token, instance_url } = tokenResponse.data;
+
+    // Get user info from Salesforce
+    const userInfo = await axios.get(`${instance_url}/services/oauth2/userinfo`, {
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+
+    // Create JWT for your app
+    const appToken = jwt.sign({
+      userId: userInfo.data.user_id,
+      email: userInfo.data.email,
+      sfAccessToken: access_token,
+      sfInstanceUrl: instance_url
+    }, JWT_SECRET, { expiresIn: '1h' });
+
+    // Redirect to frontend with token
+    res.redirect(`http://localhost:3000/auth-success?token=${appToken}`);
+    
+  } catch (error) {
+    console.error('Auth callback error:', error);
+    res.redirect(`http://localhost:3000/auth-error?message=${encodeURIComponent(error.message)}`);
+  }
+});
+
+// Token refresh endpoint
+app.post('/auth/refresh', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw new Error('Refresh token missing');
+
+    const tokenResponse = await axios.post(SF_TOKEN_URL, new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: SF_CLIENT_ID,
+      client_secret: SF_CLIENT_SECRET,
+      refresh_token: refreshToken
+    }));
+
+    res.json({
+      accessToken: tokenResponse.data.access_token,
+      expiresIn: tokenResponse.data.expires_in
+    });
+    
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    res.status(401).json({ error: error.message });
+  }
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Auth server running on port ${PORT}`));
