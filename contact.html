@@ -116,8 +116,11 @@
                     </div>
                 </div>
                 
-                <div class="contact-form">
+                <div class="contact-form" method="POST" data-netlify="true" netlify-honeypot="bot-field">
                     <h2>Send Us a Message</h2>
+                    <p class="hidden">
+                        <label>Don't fill this out if you're human: <input name="bot-field"></label>
+                      </p>
                     <form id="contactForm">
                         <div class="form-group">
                             <label for="name">Your Name</label>
@@ -187,5 +190,6 @@
     </footer>
 
     <script src="js/contact.js"></script>
+    <script src="/netlify/functions/send-reply.js"></script>
 </body>
 </html>
